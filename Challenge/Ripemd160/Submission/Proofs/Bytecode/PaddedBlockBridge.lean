@@ -592,10 +592,7 @@ private theorem applyInitStore_size_le (s : State) (w : Artifact.InitStore)
   have hoff : w.offset.toNat + 32 ≤ messageOffset := by
     simp only [Artifact.initStores, List.mem_cons, List.not_mem_nil,
       or_false] at hw
-    rcases hw with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl |
-      rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl |
-      rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;>
-      decide
+    rcases hw with rfl | rfl | rfl | rfl | rfl <;> decide
   simp only [Main.applyInitStore]
   rw [MachineState.writeBytes_size, if_neg]
   · rw [YulEvmCompiler.BytesLemmas.natToBytesPadded_size]

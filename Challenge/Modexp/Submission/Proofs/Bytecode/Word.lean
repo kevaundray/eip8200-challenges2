@@ -53,7 +53,7 @@ def startPath :
 
 def zeroTailPath :
     List (Challenge.EvmProof.Stepper.Located Artifact.submissionArtifact .Osaka) :=
-  [opAt 427 (.Dup ⟨3, by decide⟩), pushAt 428 2 6144,
+  [opAt 427 (.Dup ⟨3, by decide⟩), pushAt 428 2 0,
    opAt 429 .RETURN]
 
 def zeroModulusPath :
@@ -179,9 +179,9 @@ def zeroModulusFinalState (input : ByteArray) : State :=
       UInt256.ofNat 96, UInt256.ofNat (expOffset input),
       UInt256.ofNat (modulusOffset input), UInt256.ofNat 1267] ++ callerRest input
     halt := .Returned
-    hReturn := MachineState.readPadded ByteArray.empty 6144 (modulusSize input)
+    hReturn := MachineState.readPadded ByteArray.empty 0 (modulusSize input)
     activeWords := (Dispatch.wordEntryState input).activeWordsAfterUInt256
-      6144 (modulusSize input) }
+      0 (modulusSize input) }
 
 def byteWord (input : ByteArray) (offset : Nat) : UInt256 :=
   Accessors.calldataByteValue (Dispatch.wordEntryState input) (UInt256.ofNat offset)
@@ -546,7 +546,6 @@ theorem run_zeroTail (input : ByteArray) (hvalid : ValidInput input)
       115792089237316195423570985008687907853269984665640564039457584007913129639936 =
         modulusSize input := by
     exact Nat.mod_eq_of_lt (by norm_num at hm'; exact hm')
-  have h6144 : (6144 : UInt256).toNat = 6144 := by decide
   have h0 : (0 : UInt256).toNat = 0 := by decide
   simp [zeroTailPath, opAt, pushAt,
     Challenge.EvmProof.Stepper.runLocatedBlock,
@@ -554,7 +553,7 @@ theorem run_zeroTail (input : ByteArray) (hvalid : ValidInput input)
     zeroDispatchState, zeroModulusFinalState, nonzeroState, callerRest,
     Dispatch.wordEntryState, Main.headerState, initialState, startPCs,
     Challenge.EvmProof.Word.word_toNat_ofNat, hmmod, hmmodLiteral,
-    Nat.mod_eq_of_lt hm', h6144, h0, hmodulus]
+    Nat.mod_eq_of_lt hm', h0, hmodulus]
   simp_all [State.activeWordsAfterUInt256, MachineState.activeWordsAfter]
 
 set_option linter.unusedSimpArgs false in
@@ -1011,10 +1010,12 @@ def gasSteps_zeroModulus (input : ByteArray) (hvalid : ValidInput input)
 
 def gasSteps_zeroModulus_total (input : ByteArray) (hvalid : ValidInput input)
     (hmsize : 0 < modulusSize input) (hword : modulusSize input ≤ 32)
-    (hmodulus : modulusValue input = 0) :
+    (hmodulus : modulusValue input = 0)
+    (entry : Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0)
+      (Main.trampolineState input 1196)) :
     Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0)
       (zeroModulusFinalState input) :=
-  ((Main.gasSteps_header input hvalid).trans
+  ((Main.gasSteps_header input hvalid entry).trans
     (Dispatch.gasSteps_wordEntry input hvalid hmsize hword)).trans
       (gasSteps_zeroModulus input hvalid hmsize hword hmodulus)
 

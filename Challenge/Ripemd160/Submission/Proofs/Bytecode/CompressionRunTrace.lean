@@ -189,8 +189,8 @@ theorem states_word_above (input : ByteArray) (n address : Nat)
       change wordAt
           (CompressionTailTrace.rightTailResult
             (leftFinalState (states input n) (DriverTrace.messageOffsetWord n)
-              (UInt256.ofNat 0x643) (CompressionFullTrace.driverRest input n))
-            (DriverTrace.messageOffsetWord n) (UInt256.ofNat 0x643)
+              (UInt256.ofNat 0x436) (CompressionFullTrace.driverRest input n))
+            (DriverTrace.messageOffsetWord n) (UInt256.ofNat 0x436)
             (CompressionFullTrace.driverRest input n)) address = _
       rw [compressorResult_word_above _ _ _ _ address haddress, ih]
 
@@ -318,7 +318,7 @@ private theorem hashWords_succ (input : ByteArray) (hfit : CalldataFits input)
     constants := statesConstants input hfit n
     hash := hashAt32_of_hashWords hw }
   have hout := tail_hash_eq_compressBlock_of_inputs
-    (returnDest := UInt256.ofNat 0x643)
+    (returnDest := UInt256.ofNat 0x436)
     (rest := CompressionFullTrace.driverRest input n) hinputs
   have harray := hashArray_hashStateAfter input n
   rw [harray] at hout
@@ -328,8 +328,8 @@ private theorem hashWords_succ (input : ByteArray) (hfit : CalldataFits input)
   change OutputTrace.hWord
       (CompressionTailTrace.rightTailResult
         (leftFinalState (states input n) (DriverTrace.messageOffsetWord n)
-          (UInt256.ofNat 0x643) (CompressionFullTrace.driverRest input n))
-        (DriverTrace.messageOffsetWord n) (UInt256.ofNat 0x643)
+          (UInt256.ofNat 0x436) (CompressionFullTrace.driverRest input n))
+        (DriverTrace.messageOffsetWord n) (UInt256.ofNat 0x436)
         (CompressionFullTrace.driverRest input n)) i = _
   fin_cases i
   · exact congrArg Compression.EvmHashState.h0 hout
@@ -397,7 +397,7 @@ noncomputable def compressionRun (input : ByteArray) (hfit : CalldataFits input)
   states := states input
   initial := by
     let s := PaddingTrace.padReturned input
-    have hpc : s.pc = UInt256.ofNat 0x62c := PaddingTrace.padReturned_pc input
+    have hpc : s.pc = UInt256.ofNat 0x41f := PaddingTrace.padReturned_pc input
     have hstack : s.stack = [Padding.paddedWord input] :=
       PaddingTrace.padReturned_stack input
     change DriverTrace.setupEntry s input = s

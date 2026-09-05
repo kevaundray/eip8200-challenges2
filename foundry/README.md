@@ -3,7 +3,8 @@
 The gas numbers in the challenge READMEs are produced by concrete execution in
 the pinned Lean EVM semantics. This directory re-derives them with a completely
 separate EVM — the revm implementation inside Foundry — running the same frozen
-bytecode over the same vectors, and asserts exact agreement.
+bytecode. The MODEXP tests use the original 13-vector subset of the 61-vector
+scoring corpus.
 
 Nothing here is part of any proof, and nothing here feeds the generated README
 gas tables. It is a falsification check on the published measurements: if the
@@ -24,15 +25,15 @@ Every successful scored vector agrees to the gas. Suite totals:
 | challenge | vectors | reference (Lean scorer) | reference (revm) | delta |
 |---|---:|---:|---:|---:|
 | RIPEMD-160 | 17 | 9,862,146 | 9,862,146 | 0 |
-| MODEXP | 9 | 19,046,904 | 19,046,904 | 0 |
+| MODEXP | 13 | 860,100,123 | 860,100,123 | 0 |
 
-The `vs precompile` ratios the READMEs publish reproduce exactly as well:
-419.31× for RIPEMD-160 and 1633.53× for MODEXP. For MODEXP
+The RIPEMD-160 `vs precompile` ratio reproduces exactly. The MODEXP subset
+ratio is 16207.51×. For MODEXP,
 the check goes one step further and compares the pinned semantics' own
 Osaka/EIP-7883 precompile pricing against revm's, tuple by tuple; those agree
 too, including the 500-gas floor and the 4,080 charged for the EIP-198 examples.
 
-So the published gas measurements hold up. What was worth checking is the
+So the selected gas measurements hold up. What was worth checking is the
 methodology, and it survived: see [Measurement](#measurement) for why the
 naive way of measuring this is off by a small constant, and
 [`test/GasProbe.t.sol`](test/GasProbe.t.sol) for the controls that catch it.
@@ -47,7 +48,7 @@ through the identical probe on the identical vectors. Suite totals:
 | challenge | reference | evmification | precompile | reference ÷ evmification | reference ÷ precompile | evmification ÷ precompile |
 |---|---:|---:|---:|---:|---:|---:|
 | RIPEMD-160 | 9,862,146 | 6,597,217 | 23,520 | 1.49× | 419.31× | 280.49× |
-| MODEXP | 19,046,904 | 98,126 | 11,660 | 194× | 1633.53× | 8.42× |
+| MODEXP 13-vector subset | 860,100,123 | 759,619 | 53,068 | 1132.28× | 16207.51× | 14.31× |
 
 For RIPEMD-160 the bundled reference costs about 1.5× the hand-optimized
 Solidity, which is the expected price of a deliberately regular, proof-friendly
@@ -56,26 +57,25 @@ orders of magnitude more expensive.
 
 MODEXP is where the comparison becomes interesting, because that precompile is
 priced by operand size rather than by word count and carries a 500-gas
-EIP-7883 floor. On four of the nine vectors evmification is *cheaper* than the
+EIP-7883 floor. On four of the thirteen vectors evmification is *cheaper* than the
 precompile's own price — 349 gas against 500 for the empty tuple, the
 zero-modulus, and the zero-modulus-size cases, and 395 against 500 for the zero
-exponent. The suite ratio of 8.42× is carried almost entirely by the two EIP-198
-examples (32,350 against 4,080) and the wide-modulus tuple. Each comparison test
-reports this count directly:
+exponent. The suite ratio of 14.31× is carried by the EIP-198 examples and the
+wide-modulus, RSA, and BN254 tuples. Each comparison test reports this count
+directly:
 
 ```
-evmification at or below the precompile's price on 4 of 9 vectors    (MODEXP)
+evmification at or below the precompile's price on 4 of 13 vectors   (MODEXP)
 evmification at or below the precompile's price on 0 of 17 vectors   (RIPEMD-160)
 ```
 
-MODEXP is a different story, and the gap is concentrated in one vector. The
-257-bit-modulus tuple costs 18,958,693 gas in the reference against 28,843 in
-evmification — a factor of 657, and 99.5% of the reference's suite total. The
-reference falls off its `MULMOD` fast path as soon as the modulus exceeds 32
-bytes and switches to a schoolbook 32-limb fallback sized for the whole
-1024-byte domain, while evmification uses Montgomery/Barrett arithmetic. Both
-return the same bytes on all nine vectors; the fallback is simply not written
-for speed.
+MODEXP is a different story, and the gap is concentrated in the wide-modulus
+vectors. The RSA-2048 tuple costs 770,374,226 gas in the reference against
+555,806 in evmification. The reference falls off its `MULMOD` fast path as soon
+as the modulus exceeds 32 bytes and switches to a schoolbook 32-limb fallback
+sized for the whole 1024-byte domain, while evmification uses Montgomery/Barrett
+arithmetic. Both return the same bytes on all thirteen vectors; the fallback is
+simply not written for speed.
 
 None of this is a defect in the published numbers. It is what the numbers mean.
 

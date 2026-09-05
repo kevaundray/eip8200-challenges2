@@ -38,14 +38,14 @@ private def writeLoopState (s : State) (offset : Nat) (word ret : UInt256)
 private def afterWrittenWord (s : State) (input : ByteArray) (i : Nat) : State :=
   let loaded := loadedH s i
   let written := writeLoopState loaded (12 + 4 * i) (OutputTrace.hWord s i)
-    (UInt256.ofNat 0x676) [UInt256.ofNat i, Padding.paddedWord input] 4
+    (UInt256.ofNat 0x469) [UInt256.ofNat i, Padding.paddedWord input] 4
   { written with
-    pc := UInt256.ofNat 0x654
+    pc := UInt256.ofNat 0x447
     stack := [UInt256.ofNat (i + 1), Padding.paddedWord input] }
 
 private def outputLoopState (s : State) (input : ByteArray) : Nat → State
   | 0 => { OutputTrace.zeroOutput s with
-      pc := UInt256.ofNat 0x654
+      pc := UInt256.ofNat 0x447
       stack := [⟨0⟩, Padding.paddedWord input] }
   | i + 1 => afterWrittenWord (outputLoopState s input i) input i
 
@@ -101,7 +101,7 @@ private theorem outputLoopState_hWord (s : State) (input : ByteArray)
       change OutputTrace.hWord
         (writeLoopState (loadedH (outputLoopState s input k) k)
           (12 + 4 * k) (OutputTrace.hWord (outputLoopState s input k) k)
-          (UInt256.ofNat 0x676)
+          (UInt256.ofNat 0x469)
           [UInt256.ofNat k, Padding.paddedWord input] 4) i = _
       rw [writeLoopState_hWord_four]
       · change OutputTrace.hWord (outputLoopState s input k) i = _
@@ -129,7 +129,7 @@ private theorem outputLoopState_memory (s : State) (input : ByteArray)
   | succ i ih =>
       change (writeLoopState (loadedH (outputLoopState s input i) i)
         (12 + 4 * i) (OutputTrace.hWord (outputLoopState s input i) i)
-        (UInt256.ofNat 0x676) [UInt256.ofNat i, Padding.paddedWord input] 4).memory = _
+        (UInt256.ofNat 0x469) [UInt256.ofNat i, Padding.paddedWord input] 4).memory = _
       rw [writeLoopState_memory_four]
       change MachineState.writeBytes (outputLoopState s input i).memory
         (wordBytes (OutputTrace.hWord (outputLoopState s input i) i)) (12 + 4 * i) = _
@@ -287,5 +287,35 @@ theorem correct_of_compression
       (fullTrace input hfit (seam input hfit)).cost = GasCost.referenceGas input) :
     Correct submissionBytecode :=
   GasCost.correct_of_schedule (correctWithSchedule_of_compression seam hcost)
+
+/- The closed schedule is not needed for the minimal challenge contract. -/
+theorem correct_of_compression_trace
+    (seam : ∀ (input : ByteArray), CalldataFits input → CompressionSeam input) :
+    Correct submissionBytecode := by
+  intro input hfit
+  let trace := fullTrace input hfit (seam input hfit)
+  let q := outputLoopState ((seam input hfit).states
+    (DriverTrace.blockCount input)) input 5
+  have hcall : q.callStack = [] := by
+    simp [q, outputLoopState, afterWrittenWord, loadedH, writeLoopState,
+      OutputTrace.writeByte, OutputTrace.zeroOutput,
+      (seam input hfit).callStack (DriverTrace.blockCount input) (by omega)]
+  refine ⟨trace.cost, fun gas hgas => ?_⟩
+  have heval := Challenge.EvmProof.eval_of_steps (trace.trace gas hgas) (by
+    change (withGas
+      { q with
+        pc := UInt256.ofNat 0x479
+        stack := [Padding.paddedWord input]
+        halt := .Returned
+        hReturn := MachineState.readPadded q.memory 0 32
+        activeWords := (State.activeWordsAfterUInt256 q 0 32) }
+      (gas - trace.cost)).isDone = true
+    simp [withGas, hcall, State.isDone, State.isHalted, State.isRunning])
+  rw [State.toResult_returned _ (by rfl)] at heval
+  change Eval (withGas (initialState submissionBytecode input 0) gas)
+    (.returned (MachineState.readPadded
+      q.memory 0 32)) at heval
+  rw [readOutput_eq, outputBytes_eq_spec input (seam input hfit)] at heval
+  simpa [GasCost.withGas_initialState_zero] using heval
 
 end Challenge.Ripemd160.Submission.Proofs.Bytecode.OutputResultBridge

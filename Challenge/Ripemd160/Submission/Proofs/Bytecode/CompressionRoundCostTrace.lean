@@ -37,16 +37,16 @@ def roundWork (j : Nat) : Nat :=
   Meter.runLocatedBlockStaticCost RoundTrace.prefixPath + xAtWork +
     roundBodyWork j
 
-theorem hAtWork_eq : hAtWork = 37 := by rfl
-theorem hSetWork_eq : hSetWork = 42 := by rfl
-theorem rotlWork_eq : rotlWork = 54 := by rfl
+theorem hAtWork_eq : hAtWork = 30 := by rfl
+theorem hSetWork_eq : hSetWork = 36 := by rfl
+theorem rotlWork_eq : rotlWork = 45 := by rfl
 
 theorem fCaseWork_eq (j : Nat) (hj : j < 5) :
-    fCaseWork j = [81, 116, 142, 168, 158][j]! := by
+    fCaseWork j = [42, 51, 54, 54, 54][j]! := by
   interval_cases j <;> rfl
 
 theorem roundWork_eq (j : Nat) (hj : j < 5) :
-    roundWork j = [585, 620, 646, 672, 662][j]! := by
+    roundWork j = [515, 524, 527, 527, 527][j]! := by
   interval_cases j <;> rfl
 
 theorem rotl_cost_potential (s : State) (x n returnDest : UInt256)
@@ -143,12 +143,10 @@ theorem fCase_cost_potential (s : State) (j : Nat) (hj : j < 5)
     (by simpa [BooleanFunctionTrace.fEntry] using hfork)
     (by
       interval_cases j <;>
-        simp [BooleanFunctionTrace.casePath, BooleanFunctionTrace.test0,
-          BooleanFunctionTrace.test1, BooleanFunctionTrace.test2,
-          BooleanFunctionTrace.test3, BooleanFunctionTrace.arm0,
+        simp [BooleanFunctionTrace.casePath, BooleanFunctionTrace.dispatchPath,
+          BooleanFunctionTrace.arm0,
           BooleanFunctionTrace.arm1, BooleanFunctionTrace.arm2,
-          BooleanFunctionTrace.arm3, BooleanFunctionTrace.arm4,
-          BooleanFunctionTrace.cleanup, CopyFree])
+          BooleanFunctionTrace.arm3, BooleanFunctionTrace.arm4, CopyFree])
   simpa [BooleanFunctionTrace.gasSteps_fCase,
     BooleanFunctionTrace.fEntry, fCaseWork] using hraw
 

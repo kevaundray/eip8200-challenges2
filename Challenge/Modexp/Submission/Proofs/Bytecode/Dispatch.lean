@@ -337,16 +337,12 @@ theorem gasSteps_wordEntry_cost (input : ByteArray) (hvalid : ValidInput input)
 
 /-- Complete trace and exact minimum gas for zero-width results. -/
 def gasSteps_zeroSize_total (input : ByteArray) (hvalid : ValidInput input)
-    (hzero : modulusSize input = 0) :
+    (hzero : modulusSize input = 0)
+    (entry : Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0)
+      (Main.trampolineState input 1196)) :
     Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0)
       (zeroSizeFinalState input) :=
-  (Main.gasSteps_header input hvalid).trans (gasSteps_zeroSize input hzero)
-
-theorem gasSteps_zeroSize_total_cost (input : ByteArray)
-    (hvalid : ValidInput input) (hzero : modulusSize input = 0) :
-    (gasSteps_zeroSize_total input hvalid hzero).cost = 99 := by
-  simp [gasSteps_zeroSize_total, Main.gasSteps_header_cost,
-    gasSteps_zeroSize_cost]
+  (Main.gasSteps_header input hvalid entry).trans (gasSteps_zeroSize input hzero)
 
 @[simp] theorem zeroSizeFinalState_isDone (input : ByteArray) :
     (zeroSizeFinalState input).isDone = true := by

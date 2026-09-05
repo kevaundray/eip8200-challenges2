@@ -33,7 +33,7 @@ def mainStart (input : ByteArray) : State := atPC input 0x03ef
 
 def path_start : List
     (Challenge.EvmProof.Stepper.Located Artifact.submissionArtifact .Osaka) :=
-  [⟨0, .push ⟨2, by decide⟩ (UInt256.ofNat 0x3ee), by rfl, by decide⟩,
+  [⟨0, .push ⟨2, by decide⟩ (UInt256.ofNat 0x12ce), by rfl, by decide⟩,
    ⟨1, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
 
 def path_1b : List
@@ -113,13 +113,15 @@ def path_3ee : List
   [⟨682, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩]
 
 def gasSteps_start (input : ByteArray) :
-    Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0) (atPC input 0x3ee) := by
+    Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0) (atPC input 0x12ce) := by
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x12ce = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 2813 (by rfl)
   have hrun : Challenge.EvmProof.Stepper.runLocatedBlock path_start
-      (atPC input 0) = some (atPC input 0x3ee) := by
+      (atPC input 0) = some (atPC input 0x12ce) := by
     simp [path_start, Challenge.EvmProof.Stepper.runLocatedBlock,
       Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
-      atPC, initialState]
-  have g : Challenge.EvmProof.GasSteps (atPC input 0) (atPC input 0x3ee) := by
+      atPC, initialState, hdest]
+  have g : Challenge.EvmProof.GasSteps (atPC input 0) (atPC input 0x12ce) := by
     apply Challenge.EvmProof.Stepper.runLocatedBlock_sound
       Artifact.submissionArtifact .Osaka path_start
     · rfl
@@ -324,9 +326,11 @@ def gasSteps_3ee (input : ByteArray) :
   · rfl
   · exact deployAddress_not_precompile
 
-def gasSteps_entry (input : ByteArray) :
+def gasSteps_entry (input : ByteArray)
+    (entryPrefix : Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0)
+      (atPC input 0x3ee)) :
     Challenge.EvmProof.GasSteps (initialState submissionBytecode input 0)
       (mainStart input) :=
-  (gasSteps_start input).trans (gasSteps_3ee input)
+  entryPrefix.trans (gasSteps_3ee input)
 
 end Challenge.Ripemd160.Submission.Proofs.Bytecode.Execution

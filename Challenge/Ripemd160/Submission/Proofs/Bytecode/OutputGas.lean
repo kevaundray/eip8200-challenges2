@@ -29,7 +29,7 @@ def pathBaseCost {artifact : Challenge.EvmProof.ProgramArtifact}
 @[simp] theorem prelude_base : pathBaseCost OutputTrace.preludePath = 12 := by rfl
 @[simp] theorem outerTest_base : pathBaseCost OutputTrace.outerTestPath = 26 := by rfl
 @[simp] theorem hAtCall_base : pathBaseCost OutputTrace.hAtCallPath = 22 := by rfl
-@[simp] theorem hAt_base : pathBaseCost OutputTrace.hAtPath = 37 := by rfl
+@[simp] theorem hAt_base : pathBaseCost OutputTrace.hAtPath = 30 := by rfl
 @[simp] theorem writeCall_base : pathBaseCost OutputTrace.writeCallPath = 27 := by rfl
 @[simp] theorem writeInit_base : pathBaseCost OutputTrace.writeInitPath = 3 := by rfl
 @[simp] theorem writeTest_base : pathBaseCost OutputTrace.writeTestPath = 26 := by rfl

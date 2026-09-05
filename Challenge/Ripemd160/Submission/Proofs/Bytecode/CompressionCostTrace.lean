@@ -124,9 +124,9 @@ def tableAtWork : Nat := Meter.runLocatedBlockStaticCost TableTrace.tableAtPath
 def xAtWork : Nat := Meter.runLocatedBlockStaticCost TableTrace.xAtPath
 def wordSetWork : Nat := Meter.runLocatedBlockStaticCost TableTrace.hSetPath
 
-theorem tableAtWork_eq : tableAtWork = 57 := by rfl
-theorem xAtWork_eq : xAtWork = 37 := by rfl
-theorem wordSetWork_eq : wordSetWork = 42 := by rfl
+theorem tableAtWork_eq : tableAtWork = 27 := by rfl
+theorem xAtWork_eq : xAtWork = 30 := by rfl
+theorem wordSetWork_eq : wordSetWork = 36 := by rfl
 
 theorem tableAt_cost_potential (s : State) (base i returnDest : UInt256)
     (rest : List UInt256) (hstack : rest.length < 1016)
@@ -250,10 +250,10 @@ def scheduleWork : Nat :=
   Meter.runLocatedBlockStaticCost Schedule.conditionPath +
   Meter.runLocatedBlockStaticCost Schedule.exitPath
 
-theorem scheduleIterationWork_eq : scheduleIterationWork = 230 := by
+theorem scheduleIterationWork_eq : scheduleIterationWork = 226 := by
   rfl
 
-theorem scheduleWork_eq : scheduleWork = 3722 := by rfl
+theorem scheduleWork_eq : scheduleWork = 3658 := by rfl
 
 theorem readLE_cost_potential (s : State) (msgOff returnDest : UInt256)
     (rest : List UInt256) (i : Nat) (hstack : rest.length < 1012)

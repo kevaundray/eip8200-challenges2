@@ -338,7 +338,7 @@ theorem compress_cost_potential (s : State) (input : ByteArray) (i : Nat)
       ExactGasBridge.compressionWork + MachineState.memCost
         (CompressionFullTrace.resultState s input i).activeWords.toNat := by
   let messageOffset := DriverTrace.messageOffsetWord i
-  let returnDest := UInt256.ofNat 0x643
+  let returnDest := UInt256.ofNat 0x436
   let rest := CompressionFullTrace.driverRest input i
   let leftFinal := leftFinalState s messageOffset returnDest rest
   have hleftCode : leftFinal.executionEnv.code = submissionBytecode := by

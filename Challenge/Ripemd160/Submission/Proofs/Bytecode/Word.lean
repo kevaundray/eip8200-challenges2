@@ -17,6 +17,19 @@ open Challenge.EvmProof.Word
 
 abbrev EWord := EvmSemantics.UInt256
 
+@[simp] theorem add_zero (a : EWord) : a + 0 = a := by
+  apply word_ext
+  change (a.val + 0).val = a.val.val
+  simp
+
+theorem land_comm (a b : EWord) : UInt256.land a b = UInt256.land b a := by
+  apply word_ext
+  rw [word_toNat_land, word_toNat_land, Nat.and_comm]
+
+theorem lor_comm (a b : EWord) : UInt256.lor a b = UInt256.lor b a := by
+  apply word_ext
+  rw [word_toNat_lor, word_toNat_lor, Nat.or_comm]
+
 def evmRotl32 (x : EWord) (n : Nat) : EWord :=
   mask32 (UInt256.shiftLeft x (UInt256.ofNat n) |||
     UInt256.shiftRight x (UInt256.ofNat (32 - n)))

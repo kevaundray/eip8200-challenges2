@@ -10,8 +10,8 @@ import {ModexpDeployed} from "evmification/modexp/ModexpDeployed.sol";
 ///
 /// @dev The `leanGas` column is what `Challenge/Modexp/Scorer.lean` reports for
 ///      the frozen reference, as printed by `lake exe modexpchallenge` and
-///      summarized in that challenge's README gas table. The same 9 vectors run
-///      here against the same bytecode under revm.
+///      summarized in that challenge's README gas table. The original 13-vector
+///      subset runs here against the same bytecode under revm.
 ///
 ///      MODEXP is the sharpest of the three cross-checks. Its cost is
 ///      branch-sensitive rather than a function of calldata length alone, the
@@ -48,6 +48,10 @@ contract ModexpGasTest is GasCrossCheck {
         cases.push(ModexpCase("EIP-198 example 2", _eipExample2(), 39773, 4080));
         cases.push(ModexpCase("trailing-zero normalization", _truncatedModulus(), 3613, 500));
         cases.push(ModexpCase("257-bit modulus", _wideModulus(), 18958693, 500));
+        cases.push(ModexpCase("BN254 modular inversion", _bn254ModularInversion(), 44253, 4048));
+        cases.push(ModexpCase("random 256-bit modexp", _random256(), 44253, 4080));
+        cases.push(ModexpCase("RSA-1024 e=3", _rsa1024e3(), 70590487, 512));
+        cases.push(ModexpCase("RSA-2048 e=65537", _rsa2048e65537(), 770374226, 32768));
     }
 
     /// @dev `Scorer.eipExample1`.
@@ -86,12 +90,68 @@ contract ModexpGasTest is GasCrossCheck {
         return Vectors.makeInputBytes(base, exponent, modulus);
     }
 
+    /// @dev `Scorer.bn254ModularInversion`: `x^(p - 2) mod p` in the BN254 base field.
+    function _bn254ModularInversion() private pure returns (bytes memory) {
+        return Vectors.makeInputBytes(
+            hex"0d2fb5ffb5b07c344bcf7640e3908737f96cce132e7e9110de36377b5d5c6289",
+            hex"30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd45",
+            hex"30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47"
+        );
+    }
+
+    /// @dev `Scorer.random256`: a fixed, reproducible full-width tuple.
+    function _random256() private pure returns (bytes memory) {
+        return Vectors.makeInputBytes(
+            hex"a1f0b222a74b403a5a84d341cdd90fc26bf8769225b24557b64d01d7df61d9fd",
+            hex"eca0f5ed5862646d6dc22650707a487c3436d99d7dbbba56b2f630cb682e1941",
+            hex"afea24ccce325d471af2371241676b55270044423156c0904bb50225867f93a5"
+        );
+    }
+
+    /// @dev `Scorer.rsa1024e3`, using RFC 9500's `testRSA1024` modulus.
+    function _rsa1024e3() private pure returns (bytes memory) {
+        return Vectors.makeInputBytes(
+            hex"1370d5cf7cd3f80baf7ae9fddfdfcc0253d7d1f00fa2985f14456e44cb16bcdf"
+            hex"6269d1ed3f20cfd7a7e421752a77c1b47db96367c224e660a706bbceff1e8bae"
+            hex"1e5e0c04e5ec10b0a6876d2d05fdf6184e64794efd75567969f9f67444ba5b2d"
+            hex"2ddb6b0396504efc38ea5664a4e8f2e76c29bd9d23e15e48b40b5754830bd0f2",
+            hex"03",
+            hex"b0d18352a88f53d5516f46c20e7a367d7de88acf54a019f6def57ab9b44ceddb"
+            hex"2242b1bca0fb1b5cb82b3036176a63903564dec6eb41db2f8fc787f4e52e1149"
+            hex"e33347572973f660c3c77ca9e0821c2b695be7ae9d7d30f4079110f48aae6f8b"
+            hex"702d474b2900817f2866249bec12a2b19b8278416808f81ae1fcf9b7778a623f"
+        );
+    }
+
+    /// @dev `Scorer.rsa2048e65537`, using RFC 9500's `testRSA2048` modulus.
+    function _rsa2048e65537() private pure returns (bytes memory) {
+        return Vectors.makeInputBytes(
+            hex"0b81c9d16a35da3debeb1e95032d1a2c1793b3179d8a5fda6baa3372d44b8e89"
+            hex"8be842be71bd691a8969b83040ea9ab769c000aee702af762e164d8cfaf4599b"
+            hex"612e21bf0b5f09f1049d390c15f0dbbe9118e1460f79e4c128a5992175b58aea"
+            hex"bdeed7f45ace257a4ff2c8d94cc202cfefac112c4013ee3d25c1df1c28daf411"
+            hex"9a5fbc83a78e6b70fb2f7aca1004390385e09d6e821cd5cb7cb21d7e5cc8d792"
+            hex"2a74521233519f34f2596cab25b5fe618752b7b5fc696d8040a8ce88a337b52f"
+            hex"399a2c6ac3e4bf7fec0b1c0b4948fcc2dd1261d5347512c957dd9daae4103ac5"
+            hex"a9002ec564a1611ec2b27d297b25e296dc1610cd0f8fe7e8c15b294edd5295d4",
+            hex"010001",
+            hex"b0f9e81943a7ae9892aade17ca7c40f8744fed2f8148e6c8eaa27b7d001548fb"
+            hex"5192ab28b56c5060b118ccd131e594874c6ca989b56c27296f09fb93a034df32"
+            hex"e97c6ff0998cfd8e6f42dda58acd1fa97986f144f3d154d67650175e6854b3a9"
+            hex"52003bc06887b8455ac2b19f7b2f76504ebc98ec945571b07892150ddc6a74ca"
+            hex"0fbcd35497ce81534daf9418844b13aea31f9d5a6b9557bbdf619efd4e887f2d"
+            hex"42b8dd8bc987eae1bf89cab85ee21e356305df6c07a8838e3ef41c595dcce43d"
+            hex"afc49123ef4d8abba93d3905e4028d7ba91484a27596e07b4b6ed992f077b524"
+            hex"d3dcfe7ddd5549be7cce8da035cfa0b3fb8f9e46f732b2a86b460165c08f5313"
+        );
+    }
+
     function test_vectors_match_scorer() public view {
-        assertEq(cases.length, 9, "vector count");
+        assertEq(cases.length, 13, "vector count");
         assertEq(pin.provedSize, 1284, "reference bytecode size");
         assertEq(refAddr.code.length, 1284, "etched code size");
 
-        uint256[9] memory sizes = [uint256(0), 99, 98, 110, 98, 161, 160, 100, 163];
+        uint256[13] memory sizes = [uint256(0), 99, 98, 110, 98, 161, 160, 100, 163, 192, 192, 353, 611];
         for (uint256 i = 0; i < cases.length; i++) {
             assertEq(cases[i].input.length, sizes[i], cases[i].label);
         }
@@ -120,7 +180,7 @@ contract ModexpGasTest is GasCrossCheck {
             forgeTotal += gasUsed;
         }
         _row("all vectors", 0, leanTotal, forgeTotal);
-        assertEq(forgeTotal, 19046904, "README suite total");
+        assertEq(forgeTotal, 860100123, "13-vector subset total");
     }
 
     /// @dev The scorer's `precompile` column comes from the pinned semantics'
@@ -138,7 +198,7 @@ contract ModexpGasTest is GasCrossCheck {
             forgeTotal += precompileGas;
         }
         _row("all vectors", 0, leanTotal, forgeTotal);
-        assertEq(forgeTotal, 11660, "README precompile total");
+        assertEq(forgeTotal, 53068, "README precompile total");
     }
 
     /// @dev The scorer scores from a fixed initial state; the reference's gas
@@ -148,8 +208,8 @@ contract ModexpGasTest is GasCrossCheck {
         _assertGasIsStateIndependent(refAddr, cases[8].input, "257-bit modulus");
     }
 
-    /// @dev Recomputes the README's `vs precompile` ratio from measured gas.
-    function test_precompile_ratio_matches_readme() public view {
+    /// @dev Computes the `vs precompile` ratio for the 13-vector subset.
+    function test_subset_precompile_ratio() public view {
         uint256 referenceTotal;
         uint256 precompileTotal;
         for (uint256 i = 0; i < cases.length; i++) {
@@ -160,10 +220,10 @@ contract ModexpGasTest is GasCrossCheck {
         }
         console2.log(
             string.concat(
-                "reference vs precompile: ", _ratio(referenceTotal, precompileTotal), " (README: 1633.53x)"
+                "reference vs precompile: ", _ratio(referenceTotal, precompileTotal), " (subset: 16207.51x)"
             )
         );
-        assertEq(_ratio(referenceTotal, precompileTotal), "1633.53x", "vs precompile ratio");
+        assertEq(_ratio(referenceTotal, precompileTotal), "16207.51x", "vs precompile ratio");
     }
 
     /// @notice Measures eth-act/evmification's Solidity implementation on the

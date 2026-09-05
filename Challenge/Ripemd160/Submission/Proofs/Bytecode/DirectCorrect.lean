@@ -70,14 +70,14 @@ private theorem writeLoopState_normalized (s : State) (offset : Nat)
 private def afterWrittenWord (s : State) (input : ByteArray) (i : Nat) : State :=
   let loaded := loadedH s i
   let written := writeLoopState loaded (12 + 4 * i) (OutputTrace.hWord s i)
-    (UInt256.ofNat 0x676) [UInt256.ofNat i, Padding.paddedWord input] 4
+    (UInt256.ofNat 0x469) [UInt256.ofNat i, Padding.paddedWord input] 4
   { written with
-    pc := UInt256.ofNat 0x654
+    pc := UInt256.ofNat 0x447
     stack := [UInt256.ofNat (i + 1), Padding.paddedWord input] }
 
 private def outputLoopState (s : State) (input : ByteArray) : Nat → State
   | 0 => { OutputTrace.zeroOutput s with
-      pc := UInt256.ofNat 0x654
+      pc := UInt256.ofNat 0x447
       stack := [⟨0⟩, Padding.paddedWord input] }
   | i + 1 => afterWrittenWord (outputLoopState s input i) input i
 
@@ -99,7 +99,7 @@ private def outputLoopState (s : State) (input : ByteArray) : Nat → State
 
 @[simp] private theorem outputLoopState_pc (s : State)
     (input : ByteArray) (i : Nat) :
-    (outputLoopState s input i).pc = UInt256.ofNat 0x654 := by
+    (outputLoopState s input i).pc = UInt256.ofNat 0x447 := by
   cases i <;> rfl
 
 @[simp] private theorem outputLoopState_stack (s : State)
@@ -120,7 +120,7 @@ private def outputLoopState (s : State) (input : ByteArray) : Nat → State
 private theorem outputLoopState_normalized (s : State) (input : ByteArray)
     (i : Nat) :
     { outputLoopState s input i with
-      pc := UInt256.ofNat 0x654
+      pc := UInt256.ofNat 0x447
       stack := [UInt256.ofNat i, Padding.paddedWord input] } =
       outputLoopState s input i := by
   cases i <;> rfl
@@ -134,7 +134,7 @@ private theorem outputLoopState_normalized (s : State) (input : ByteArray)
 private def outputResult (s : State) (input : ByteArray) : State :=
   let q := outputLoopState s input 5
   { q with
-    pc := UInt256.ofNat 0x686
+    pc := UInt256.ofNat 0x479
     stack := [Padding.paddedWord input]
     halt := .Returned
     hReturn := MachineState.readPadded q.memory 0 32
@@ -265,10 +265,10 @@ private def gasSteps_outputIteration (s : State) (input : ByteArray)
       q.executionEnv.codeAddr = false := by simpa [q] using hnp
   have gconditionRaw : GasSteps
       { q with
-        pc := UInt256.ofNat 0x654
+        pc := UInt256.ofNat 0x447
         stack := [UInt256.ofNat i, Padding.paddedWord input] }
       { q with
-        pc := UInt256.ofNat 0x65e
+        pc := UInt256.ofNat 0x451
         stack := [UInt256.ofNat i, Padding.paddedWord input] } := by
     apply Output.gasSteps_block OutputTrace.outerTestPath
     · exact qcode
@@ -279,18 +279,18 @@ private def gasSteps_outputIteration (s : State) (input : ByteArray)
     · exact qnp
   have gcondition : GasSteps q
       { q with
-        pc := UInt256.ofNat 0x65e
+        pc := UInt256.ofNat 0x451
         stack := [UInt256.ofNat i, Padding.paddedWord input] } :=
     GasSteps.cast gconditionRaw
       (by simpa [q] using outputLoopState_normalized s input i) rfl
   have gcall : GasSteps
       { q with
-        pc := UInt256.ofNat 0x65e
+        pc := UInt256.ofNat 0x451
         stack := [UInt256.ofNat i, Padding.paddedWord input] }
       { q with
         pc := UInt256.ofNat 0x20
-        stack := [UInt256.ofNat i, ⟨0⟩, UInt256.ofNat 0x66a,
-          UInt256.ofNat 0x676, UInt256.ofNat i, Padding.paddedWord input] } := by
+        stack := [UInt256.ofNat i, ⟨0⟩, UInt256.ofNat 0x45d,
+          UInt256.ofNat 0x469, UInt256.ofNat i, Padding.paddedWord input] } := by
     apply Output.gasSteps_block OutputTrace.hAtCallPath
     · exact qcode
     · exact qfork
@@ -301,17 +301,17 @@ private def gasSteps_outputIteration (s : State) (input : ByteArray)
   have gh : GasSteps
       { q with
         pc := UInt256.ofNat 0x20
-        stack := [UInt256.ofNat i, ⟨0⟩, UInt256.ofNat 0x66a,
-          UInt256.ofNat 0x676, UInt256.ofNat i, Padding.paddedWord input] }
+        stack := [UInt256.ofNat i, ⟨0⟩, UInt256.ofNat 0x45d,
+          UInt256.ofNat 0x469, UInt256.ofNat i, Padding.paddedWord input] }
       { loadedH q i with
-        pc := UInt256.ofNat 0x66a
-        stack := [OutputTrace.hWord q i, UInt256.ofNat 0x676,
+        pc := UInt256.ofNat 0x45d
+        stack := [OutputTrace.hWord q i, UInt256.ofNat 0x469,
           UInt256.ofNat i, Padding.paddedWord input] } := by
     apply Output.gasSteps_block OutputTrace.hAtPath
     · exact qcode
     · exact qfork
     · simpa [loadedH] using OutputTrace.run_hAt q i
-        [UInt256.ofNat 0x676, UInt256.ofNat i, Padding.paddedWord input]
+        [UInt256.ofNat 0x469, UInt256.ofNat i, Padding.paddedWord input]
         hi (by simp) qcode qrun
     · exact qrun
     · exact qnp
@@ -332,13 +332,13 @@ private def gasSteps_outputIteration (s : State) (input : ByteArray)
     exact qnp
   have gwcall : GasSteps
       { loaded with
-        pc := UInt256.ofNat 0x66a
-        stack := [OutputTrace.hWord q i, UInt256.ofNat 0x676,
+        pc := UInt256.ofNat 0x45d
+        stack := [OutputTrace.hWord q i, UInt256.ofNat 0x469,
           UInt256.ofNat i, Padding.paddedWord input] }
       { loaded with
         pc := UInt256.ofNat 0x3c6
         stack := [UInt256.ofNat (12 + 4 * i), OutputTrace.hWord q i,
-          UInt256.ofNat 0x676, UInt256.ofNat i, Padding.paddedWord input] } := by
+          UInt256.ofNat 0x469, UInt256.ofNat i, Padding.paddedWord input] } := by
     apply Output.gasSteps_block OutputTrace.writeCallPath
     · exact loadedCode
     · exact loadedFork
@@ -347,12 +347,12 @@ private def gasSteps_outputIteration (s : State) (input : ByteArray)
     · exact loadedRun
     · exact loadedNp
   have gwrite := gasSteps_writeWord loaded (12 + 4 * i)
-    (OutputTrace.hWord q i) (UInt256.ofNat 0x676)
+    (OutputTrace.hWord q i) (UInt256.ofNat 0x469)
     [UInt256.ofNat i, Padding.paddedWord input] (by simp) (by omega)
     loadedCode loadedFork loadedRun
-    loadedNp (by decide)
+    loadedNp (by exact Artifact.submissionArtifact.isValidJumpDest_index 752 (by rfl))
   let written := writeLoopState loaded (12 + 4 * i) (OutputTrace.hWord q i)
-    (UInt256.ofNat 0x676) [UInt256.ofNat i, Padding.paddedWord input] 4
+    (UInt256.ofNat 0x469) [UInt256.ofNat i, Padding.paddedWord input] 4
   have writtenCode : written.executionEnv.code = submissionBytecode := by
     simpa [written] using loadedCode
   have writtenFork : written.fork = .Osaka := by
@@ -362,7 +362,7 @@ private def gasSteps_outputIteration (s : State) (input : ByteArray)
       written.executionEnv.codeAddr = false := by simpa [written] using loadedNp
   have gnext : GasSteps
       { written with
-        pc := UInt256.ofNat 0x676
+        pc := UInt256.ofNat 0x469
         stack := [UInt256.ofNat i, Padding.paddedWord input] }
       (afterWrittenWord q input i) := by
     apply Output.gasSteps_block OutputTrace.outerNextPath
@@ -403,10 +403,10 @@ private def gasSteps_output (s : State) (input : ByteArray)
       q.executionEnv.codeAddr = false := by simpa [q] using hnp
   have gexitRaw : GasSteps
       { q with
-        pc := UInt256.ofNat 0x654
+        pc := UInt256.ofNat 0x447
         stack := [UInt256.ofNat 5, Padding.paddedWord input] }
       { q with
-        pc := UInt256.ofNat 0x681
+        pc := UInt256.ofNat 0x474
         stack := [UInt256.ofNat 5, Padding.paddedWord input] } := by
     apply Output.gasSteps_block OutputTrace.outerTestPath
     · exact qcode
@@ -417,7 +417,7 @@ private def gasSteps_output (s : State) (input : ByteArray)
     · exact qnp
   have gexit : GasSteps q
       { q with
-        pc := UInt256.ofNat 0x681
+        pc := UInt256.ofNat 0x474
         stack := [UInt256.ofNat 5, Padding.paddedWord input] } :=
     GasSteps.cast gexitRaw
       (by simpa [q] using outputLoopState_normalized s input 5) rfl

@@ -24,8 +24,15 @@ class Track:
 
 
 TRACKS = {
-    "modexp": Track("Modexp", "MODEXP", 9, False),
+    "modexp": Track("Modexp", "MODEXP", 61, False),
     "ripemd160": Track("Ripemd160", "RIPEMD-160", 17, True),
+}
+
+MODEXP_SCORE_SCALE = 1_000
+MODEXP_BUCKETS = {
+    "256-bit": ("generated 256-bit #", 32),
+    "RSA-1024": ("generated RSA-1024 #", 10),
+    "RSA-2048": ("generated RSA-2048 #", 6),
 }
 
 
@@ -190,9 +197,28 @@ def parse_modexp_csv(path: Path, expected_count: int) -> tuple[int, dict[str, ob
 
     if len(rows) != expected_count:
         raise ValueError(f"expected {expected_count} vectors, got {len(rows)}")
+
+    bucket_scores: dict[str, int] = {}
+    for bucket, (prefix, expected_bucket_count) in MODEXP_BUCKETS.items():
+        selected = [values for label, values in rows.items() if label.startswith(prefix)]
+        if len(selected) != expected_bucket_count:
+            raise ValueError(
+                f"{bucket} bucket expected {expected_bucket_count} vectors, got {len(selected)}"
+            )
+        if any(precompile == 0 for _, precompile in selected):
+            raise ValueError(f"{bucket} bucket contains zero precompile gas")
+        normalized = [
+            gas * MODEXP_SCORE_SCALE // precompile for gas, precompile in selected
+        ]
+        bucket_scores[bucket] = sum(normalized) // len(normalized)
+
+    score = sum(bucket_scores.values()) // len(bucket_scores)
     total = sum(gas for gas, _ in rows.values())
-    return total, {
+    return score, {
         "vectors": len(rows),
+        "scoredVectors": sum(count for _, count in MODEXP_BUCKETS.values()),
+        "normalizationScale": MODEXP_SCORE_SCALE,
+        "bucketScores": bucket_scores,
         "totalGas": total,
         "precompileTotalGas": sum(precompile for _, precompile in rows.values()),
     }
@@ -225,9 +251,10 @@ def write_score(
         json.dumps({"score": score, "metrics": metrics}, indent=2) + "\n",
     )
 
+    score_name = "normalized gas score" if track_name == "modexp" else "gas score"
     summary = (
         f"## EIP-8200 {track.display_name} benchmark\n\n"
-        f"- Verified gas score: **{score:,}**\n"
+        f"- Verified {score_name}: **{score:,}**\n"
         f"- Bytecode size: **{len(artifact) // 2:,} bytes**\n"
         f"- Correctness vectors: **{track.vector_count}/{track.vector_count}**\n"
         "- Lean Comparator: **accepted**\n"

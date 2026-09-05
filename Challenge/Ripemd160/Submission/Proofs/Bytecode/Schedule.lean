@@ -1,9 +1,10 @@
 import Challenge.Ripemd160.Submission.Proofs.Bytecode.Artifact
+import Challenge.Ripemd160.Submission.Proofs.Bytecode.Word
 import Challenge.EvmProof.Meter
 
 set_option warningAsError true
-set_option maxRecDepth 10000
-set_option maxHeartbeats 2000000
+set_option maxRecDepth 50000
+set_option maxHeartbeats 8000000
 
 /-!
 # Direct bytecode trace for the RIPEMD-160 message schedule
@@ -105,18 +106,16 @@ def setupXSetPath : List Located :=
 
 def xSetPath : List Located :=
   [⟨70, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨71, .push ⟨4, by decide⟩ (UInt256.ofNat 0xffffffff), by rfl, by decide⟩,
-   ⟨72, .op (.Dup ⟨2, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨73, .op .AND, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨74, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨75, .push ⟨1, by decide⟩ (UInt256.ofNat 5), by rfl, by decide⟩,
-   ⟨76, .op .SHL, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨77, .push ⟨2, by decide⟩ (UInt256.ofNat 0x2a0), by rfl, by decide⟩,
-   ⟨78, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨71, .push ⟨1, by decide⟩ (UInt256.ofNat 5), by rfl, by decide⟩,
+   ⟨72, .op .SHL, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨73, .push ⟨2, by decide⟩ (UInt256.ofNat 672), by rfl, by decide⟩,
+   ⟨74, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨75, .op (.Swap ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨76, .push ⟨4, by decide⟩ (UInt256.ofNat 4294967295), by rfl, by decide⟩,
+   ⟨77, .op .AND, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨78, .op (.Swap ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
    ⟨79, .op .MSTORE, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨80, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨81, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨82, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
+   ⟨80, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
 
 def incrementPath : List Located :=
   [⟨436, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
@@ -153,8 +152,7 @@ def exitPath : List Located :=
 
 @[simp] private theorem xSetPC (i : Nat) (hlo : 70 ≤ i) (hhi : i ≤ 82) :
     Artifact.submissionArtifact.instructionPC i =
-      [0x5f, 0x60, 0x65, 0x66, 0x67, 0x68, 0x6a,
-       0x6b, 0x6e, 0x6f, 0x70, 0x71, 0x72][i - 70]! := by
+      [95, 96, 98, 99, 102, 103, 104, 109, 110, 111, 112, 113, 114][i - 70]! := by
   interval_cases i <;> rfl
 
 def loadOffsetWord (msgOff : UInt256) (i : Nat) : UInt256 :=
@@ -290,7 +288,8 @@ theorem run_setupRead (s : State) (msgOff returnDest : UInt256)
   have hc6 : rest.length + 6 < 1024 := by omega
   have hc7 : rest.length + 7 < 1024 := by omega
   have hc8 : rest.length + 8 < 1024 := by omega
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x1b7 = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x1b7 = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 316 (by rfl)
   have hoff : msgOff + UInt256.shiftLeft (UInt256.ofNat i) (UInt256.ofNat 2) =
       loadOffsetWord msgOff i := by
     rw [loadOffsetWord]
@@ -334,7 +333,8 @@ theorem run_readLE (s : State) (msgOff returnDest : UInt256)
   have hc10 : rest.length + 10 < 1024 := by omega
   have hc11 : rest.length + 11 < 1024 := by omega
   have hc12 : rest.length + 12 < 1024 := by omega
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x253 = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x253 = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 432 (by rfl)
   simp [readLEPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
     readEntry, afterRead, readLEWord, List.exchange,
@@ -352,7 +352,8 @@ theorem run_setupXSet (s : State) (msgOff returnDest : UInt256)
   have hc5 : rest.length + 5 < 1024 := by omega
   have hc6 : rest.length + 6 < 1024 := by omega
   have hc7 : rest.length + 7 < 1024 := by omega
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x5f = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x5f = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 70 (by rfl)
   simp [setupXSetPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
     afterRead, xSetEntry, hc5, hc6, hc7, hrun, hcode, hdest]
@@ -372,12 +373,15 @@ theorem run_xSet (s : State) (msgOff returnDest : UInt256)
   have hc7 : rest.length + 7 < 1024 := by omega
   have hc8 : rest.length + 8 < 1024 := by omega
   have hc9 : rest.length + 9 < 1024 := by omega
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x259 = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x259 = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 436 (by rfl)
   have hslot : UInt256.ofNat 0x2a0 +
         UInt256.shiftLeft (UInt256.ofNat i) (UInt256.ofNat 5) = xSlotWord i := by
     rw [xSlotWord]
     exact Challenge.EvmProof.Word.word_add_comm _ _
-  simp [xSetPath, Challenge.EvmProof.Stepper.runLocatedBlock,
+  simp [xSetPath, Word.land_comm, List.exchange,
+    Challenge.EvmProof.Word.ofNat_add_mod,
+    Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
     xSetEntry, afterStore, afterRead, List.exchange,
     hc4, hc5, hc6, hc7, hc8, hc9, hrun, hcode, hdest, hslot,
@@ -397,7 +401,8 @@ theorem run_increment (s : State) (msgOff returnDest : UInt256)
   have hc5 : rest.length + 5 < 1024 := by omega
   have hadd : UInt256.ofNat i + UInt256.ofNat 1 = UInt256.ofNat (i + 1) :=
     Challenge.EvmProof.Word.ofNat_add_ofNat (by omega)
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x238 = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x238 = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 415 (by rfl)
   simp [incrementPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
     afterStore, afterIteration, afterRead, List.exchange,
@@ -584,7 +589,8 @@ theorem run_condition_exit (s : State) (msgOff returnDest : UInt256)
   have hlt : UInt256.lt (UInt256.ofNat 16) (UInt256.ofNat 16) = 0 := by decide
   have hzero : UInt256.isZero (0 : UInt256) = UInt256.ofNat 1 := by decide
   have htrue : UInt256.isTrue (UInt256.ofNat 1) = true := by decide
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x264 = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x264 = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 444 (by rfl)
   simp [conditionPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
     loopAt, afterExitCondition, hc3, hc4, hc5, hrun, hcode,

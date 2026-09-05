@@ -16,8 +16,8 @@ optimizer_runs = 10000
 # Spec.lean initialState), so the cross-check must run under the same fork.
 evm_version = "osaka"
 
-# The reference vectors reach ~19M gas in a single call (MODEXP, 257-bit
-# modulus), and a table test makes every call in one transaction.
+# The reference vectors reach ~770M gas in a single call (MODEXP, RSA-2048),
+# and a table test makes every call in one transaction.
 gas_limit = 9999999999999
 
 # The suite reads the frozen reference artifacts from the challenge

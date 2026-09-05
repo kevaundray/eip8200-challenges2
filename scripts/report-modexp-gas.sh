@@ -11,7 +11,7 @@ readonly challenge_slug="modexp"
 readonly marker_id="MODEXP"
 readonly report_script_path="scripts/report-modexp-gas.sh"
 readonly scorer_exe="modexpchallenge"
-readonly expected_rows=9
+readonly expected_rows=61
 
 source scripts/lib/check-hash-submissions.sh
 
@@ -34,6 +34,10 @@ readonly report_labels=(
   "zero modulus size"
   "EIP-198 example 1"
   "257-bit modulus"
+  "BN254 modular inversion"
+  "random 256-bit modexp"
+  "RSA-1024 e=3"
+  "RSA-2048 e=65537"
 )
 
 discover_submissions() {
@@ -333,8 +337,8 @@ main() {
     'precompile and against the bundled reference. These measurements are tests,' \
     'not proofs.'
   printf '\n'
-  printf '| implementation | bytes | empty | small | zero exp | zero mod | zero M | EIP-198 #1 | 257-bit M | all vectors | vs precompile | vs reference |\n'
-  printf '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n'
+  printf '| implementation | bytes | empty | small | zero exp | zero mod | zero M | EIP-198 #1 | 257-bit M | BN254 inv | random 256 | RSA-1024 e=3 | RSA-2048 e=65537 | all vectors | vs precompile | vs reference |\n'
+  printf '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n'
   local index
   for index in "${!implementation_names[@]}"; do
     report_measured_row "$index"

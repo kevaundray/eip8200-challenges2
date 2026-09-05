@@ -5,11 +5,21 @@ scored tracks on a shared branch:
 
 | track | editable path | score |
 | --- | --- | --- |
-| `modexp` | `Challenge/Modexp/Submission` | gas over 9 vectors |
+| `modexp` | `Challenge/Modexp/Submission` | normalized gas over 48 ranked vectors |
 | `ripemd160` | `Challenge/Ripemd160/Submission` | clean-state gas over 17 vectors |
 
 Lower is better in every track. The editable paths are deliberately disjoint,
 so Yukon can promote one track without replacing a sibling track's solution.
+
+MODEXP checks all 61 vectors for correctness. Its ranked corpus has three
+buckets: 32 256-bit cases, 10 RSA-1024 cases, and 6 RSA-2048 cases. The other
+13 vectors are correctness checks only.
+
+For each ranked vector, the parser divides candidate gas by the Osaka
+precompile gas. It scales this ratio by 1,000 and uses integer arithmetic.
+It averages the ratios in each bucket. The final score is the average of the
+three bucket scores. Thus, each operand-size bucket has equal weight when its
+absolute gas and vector count differ.
 
 ## Selecting a track
 

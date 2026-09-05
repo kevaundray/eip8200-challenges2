@@ -757,7 +757,7 @@ theorem leftStates_concrete (inputs :
           (leftFirstReturned q messageOffset returnDest rest i)
           (UInt256.ofNat 1184) (UInt256.ofNat i) =
             UInt256.ofNat (Crypto.Ripemd160.r[i]!) := by
-        rw [TableTrace.tableValue_tableByte _ 1184 i (by omega) hi]
+        rw [TableTrace.tableValue_tableByte _ 1184 i (by omega) (by omega) hi]
         change InitializationCorrect.tableByte q.memory 1184 i = _
         rw [leftStates_tableByte _ _ _ _ i 1184 i (by omega)]
         exact htables.1 i hi
@@ -789,7 +789,7 @@ theorem leftStates_concrete (inputs :
               (rest := rest) inputs _ (leftSelector_lt i hi)
       have hrotationWord : TableTrace.tableValue q (UInt256.ofNat 1376)
           (UInt256.ofNat i) = UInt256.ofNat (Crypto.Ripemd160.s[i]!) := by
-        rw [TableTrace.tableValue_tableByte _ 1376 i (by omega) hi]
+        rw [TableTrace.tableValue_tableByte _ 1376 i (by omega) (by omega) hi]
         rw [leftStates_tableByte _ _ _ _ i 1376 i (by omega)]
         exact htables.2.2.1 i hi
       have hrotation : (TableTrace.tableValue q (UInt256.ofNat 1376)
@@ -861,7 +861,7 @@ theorem rightStates_concrete (inputs :
           (rightFirstReturned q messageOffset returnDest rest i)
           (UInt256.ofNat 1280) (UInt256.ofNat i) =
             UInt256.ofNat (Crypto.Ripemd160.rP[i]!) := by
-        rw [TableTrace.tableValue_tableByte _ 1280 i (by omega) hi]
+        rw [TableTrace.tableValue_tableByte _ 1280 i (by omega) (by omega) hi]
         change InitializationCorrect.tableByte q.memory 1280 i = _
         rw [rightStates_tableByte _ _ _ _ i 1280 i (by omega)]
         unfold rightInitialState leftFinalState
@@ -897,7 +897,7 @@ theorem rightStates_concrete (inputs :
               (rest := rest) inputs _ (rightSelector_lt i hi)
       have hrotationWord : TableTrace.tableValue q (UInt256.ofNat 1472)
           (UInt256.ofNat i) = UInt256.ofNat (Crypto.Ripemd160.sP[i]!) := by
-        rw [TableTrace.tableValue_tableByte _ 1472 i (by omega) hi]
+        rw [TableTrace.tableValue_tableByte _ 1472 i (by omega) (by omega) hi]
         rw [rightStates_tableByte _ _ _ _ i 1472 i (by omega)]
         unfold rightInitialState leftFinalState
         rw [leftStates_tableByte _ _ _ _ 80 1472 i (by omega)]

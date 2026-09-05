@@ -31,60 +31,56 @@ abbrev Located :=
   Challenge.EvmProof.Stepper.Located Artifact.submissionArtifact .Osaka
 
 def setupPath : List Located :=
-  [⟨768, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨769, .push ⟨0, by decide⟩ ⟨0⟩, by rfl, by decide⟩]
+  [⟨702, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨703, .push ⟨0, by decide⟩ ⟨0⟩, by rfl, by decide⟩]
 
 def conditionPath : List Located :=
-  [⟨770, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨771, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨772, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨773, .op .LT, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨774, .op .ISZERO, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨775, .push ⟨2, by decide⟩ (UInt256.ofNat 0x64e), by rfl, by decide⟩,
-   ⟨776, .op .JUMPI, by rfl, wfOp (by decide) trivial rfl⟩]
+  [⟨704, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨705, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨706, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨707, .op .EQ, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨708, .push ⟨2, by decide⟩ (UInt256.ofNat 0x11e4), by rfl, by decide⟩,
+   ⟨709, .op .JUMPI, by rfl, wfOp (by decide) trivial rfl⟩]
 
 def callPath : List Located :=
-  [⟨777, .push ⟨2, by decide⟩ (UInt256.ofNat 0x643), by rfl, by decide⟩,
-   ⟨778, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨779, .push ⟨2, by decide⟩ (UInt256.ofNat Padding.messageOffset),
+  [⟨710, .push ⟨2, by decide⟩ (UInt256.ofNat 0x436), by rfl, by decide⟩,
+   ⟨711, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨712, .push ⟨2, by decide⟩ (UInt256.ofNat Padding.messageOffset),
       by rfl, by decide⟩,
-   ⟨780, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨781, .push ⟨2, by decide⟩ (UInt256.ofNat 0x26d), by rfl, by decide⟩,
-   ⟨782, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
+   ⟨713, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨714, .push ⟨2, by decide⟩ (UInt256.ofNat 0x129e), by rfl, by decide⟩,
+   ⟨715, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
 
 def incrementPath : List Located :=
-  [⟨783, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨784, .push ⟨1, by decide⟩ (UInt256.ofNat 64), by rfl, by decide⟩,
-   ⟨785, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨786, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨787, .op (.Swap ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨788, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨789, .push ⟨2, by decide⟩ (UInt256.ofNat 0x62e), by rfl, by decide⟩,
-   ⟨790, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
+  [⟨717, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨718, .push ⟨1, by decide⟩ (UInt256.ofNat 64), by rfl, by decide⟩,
+   ⟨719, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨720, .push ⟨2, by decide⟩ (UInt256.ofNat 0x421), by rfl, by decide⟩,
+   ⟨721, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
 
-@[simp] private theorem pc768 : Artifact.submissionArtifact.instructionPC 768 = 0x62c := by decide
-@[simp] private theorem pc769 : Artifact.submissionArtifact.instructionPC 769 = 0x62d := by decide
-@[simp] private theorem pc770 : Artifact.submissionArtifact.instructionPC 770 = 0x62e := by decide
-@[simp] private theorem pc771 : Artifact.submissionArtifact.instructionPC 771 = 0x62f := by decide
-@[simp] private theorem pc772 : Artifact.submissionArtifact.instructionPC 772 = 0x630 := by decide
-@[simp] private theorem pc773 : Artifact.submissionArtifact.instructionPC 773 = 0x631 := by decide
-@[simp] private theorem pc774 : Artifact.submissionArtifact.instructionPC 774 = 0x632 := by decide
-@[simp] private theorem pc775 : Artifact.submissionArtifact.instructionPC 775 = 0x633 := by decide
-@[simp] private theorem pc776 : Artifact.submissionArtifact.instructionPC 776 = 0x636 := by decide
-@[simp] private theorem pc777 : Artifact.submissionArtifact.instructionPC 777 = 0x637 := by decide
-@[simp] private theorem pc778 : Artifact.submissionArtifact.instructionPC 778 = 0x63a := by decide
-@[simp] private theorem pc779 : Artifact.submissionArtifact.instructionPC 779 = 0x63b := by decide
-@[simp] private theorem pc780 : Artifact.submissionArtifact.instructionPC 780 = 0x63e := by decide
-@[simp] private theorem pc781 : Artifact.submissionArtifact.instructionPC 781 = 0x63f := by decide
-@[simp] private theorem pc782 : Artifact.submissionArtifact.instructionPC 782 = 0x642 := by decide
-@[simp] private theorem pc783 : Artifact.submissionArtifact.instructionPC 783 = 0x643 := by decide
-@[simp] private theorem pc784 : Artifact.submissionArtifact.instructionPC 784 = 0x644 := by decide
-@[simp] private theorem pc785 : Artifact.submissionArtifact.instructionPC 785 = 0x646 := by decide
-@[simp] private theorem pc786 : Artifact.submissionArtifact.instructionPC 786 = 0x647 := by decide
-@[simp] private theorem pc787 : Artifact.submissionArtifact.instructionPC 787 = 0x648 := by decide
-@[simp] private theorem pc788 : Artifact.submissionArtifact.instructionPC 788 = 0x649 := by decide
-@[simp] private theorem pc789 : Artifact.submissionArtifact.instructionPC 789 = 0x64a := by decide
-@[simp] private theorem pc790 : Artifact.submissionArtifact.instructionPC 790 = 0x64d := by decide
+@[simp] private theorem pc768 : Artifact.submissionArtifact.instructionPC 702 = 0x41f := by decide
+@[simp] private theorem pc769 : Artifact.submissionArtifact.instructionPC 703 = 0x420 := by decide
+@[simp] private theorem pc770 : Artifact.submissionArtifact.instructionPC 704 = 0x421 := by decide
+@[simp] private theorem pc771 : Artifact.submissionArtifact.instructionPC 705 = 0x422 := by decide
+@[simp] private theorem pc772 : Artifact.submissionArtifact.instructionPC 706 = 0x423 := by decide
+@[simp] private theorem pc773 : Artifact.submissionArtifact.instructionPC 707 = 0x424 := by decide
+@[simp] private theorem pc774 : Artifact.submissionArtifact.instructionPC 708 = 0x425 := by decide
+@[simp] private theorem pc775 : Artifact.submissionArtifact.instructionPC 709 = 0x428 := by decide
+@[simp] private theorem pc776 : Artifact.submissionArtifact.instructionPC 710 = 0x429 := by decide
+@[simp] private theorem pc777 : Artifact.submissionArtifact.instructionPC 711 = 0x42c := by decide
+@[simp] private theorem pc778 : Artifact.submissionArtifact.instructionPC 712 = 0x42d := by decide
+@[simp] private theorem pc779 : Artifact.submissionArtifact.instructionPC 713 = 0x430 := by decide
+@[simp] private theorem pc780 : Artifact.submissionArtifact.instructionPC 714 = 0x431 := by decide
+@[simp] private theorem pc781 : Artifact.submissionArtifact.instructionPC 715 = 0x434 := by decide
+@[simp] private theorem pc782 : Artifact.submissionArtifact.instructionPC 716 = 0x435 := by decide
+@[simp] private theorem pc783 : Artifact.submissionArtifact.instructionPC 717 = 0x436 := by decide
+@[simp] private theorem pc784 : Artifact.submissionArtifact.instructionPC 718 = 0x437 := by decide
+@[simp] private theorem pc785 : Artifact.submissionArtifact.instructionPC 719 = 0x439 := by decide
+@[simp] private theorem pc786 : Artifact.submissionArtifact.instructionPC 720 = 0x43a := by decide
+@[simp] private theorem pc787 : Artifact.submissionArtifact.instructionPC 721 = 0x43d := by decide
+@[simp] private theorem pc788 : Artifact.submissionArtifact.instructionPC 722 = 0x43e := by decide
+@[simp] private theorem pc789 : Artifact.submissionArtifact.instructionPC 723 = 0x43f := by decide
+@[simp] private theorem pc790 : Artifact.submissionArtifact.instructionPC 724 = 0x440 := by decide
 
 def blockCount (input : ByteArray) : Nat :=
   Padding.paddedLength input.size / 64
@@ -98,32 +94,40 @@ def messageOffsetWord (i : Nat) : UInt256 :=
 
 def setupEntry (s : State) (input : ByteArray) : State :=
   { s with
-    pc := UInt256.ofNat 0x62c
+    pc := UInt256.ofNat 0x41f
     stack := [Padding.paddedWord input] }
 
 def loopAt (s : State) (input : ByteArray) (i : Nat) : State :=
   { s with
-    pc := UInt256.ofNat 0x62e
+    pc := UInt256.ofNat 0x421
     stack := [blockOffsetWord i, Padding.paddedWord input] }
 
 def afterCondition (s : State) (input : ByteArray) (i : Nat) : State :=
   { s with
-    pc := UInt256.ofNat 0x637
+    pc := UInt256.ofNat 0x429
     stack := [blockOffsetWord i, Padding.paddedWord input] }
+
+/-- State at the appended empty-input dispatcher. Its stack matches the
+ordinary compression entry stack. -/
+def dispatchEntry (s : State) (input : ByteArray) (i : Nat) : State :=
+  { s with
+    pc := UInt256.ofNat 0x129e
+    stack := [messageOffsetWord i, UInt256.ofNat 0x436,
+      blockOffsetWord i, Padding.paddedWord input] }
 
 /-- State at the compression entry point. The helper receives the concrete
 padded-message pointer, its return destination, and the driver invariant
 stack underneath. -/
 def compressEntry (s : State) (input : ByteArray) (i : Nat) : State :=
   { s with
-    pc := UInt256.ofNat 0x26d
-    stack := [messageOffsetWord i, UInt256.ofNat 0x643,
+    pc := UInt256.ofNat 0x519
+    stack := [messageOffsetWord i, UInt256.ofNat 0x436,
       blockOffsetWord i, Padding.paddedWord input] }
 
 /-- Normalize an arbitrary post-compression state to the driver's return seam. -/
 def compressReturned (s : State) (input : ByteArray) (i : Nat) : State :=
   { s with
-    pc := UInt256.ofNat 0x643
+    pc := UInt256.ofNat 0x436
     stack := [blockOffsetWord i, Padding.paddedWord input] }
 
 def afterIteration (s : State) (input : ByteArray) (i : Nat) : State :=
@@ -131,7 +135,7 @@ def afterIteration (s : State) (input : ByteArray) (i : Nat) : State :=
 
 def afterExit (s : State) (input : ByteArray) : State :=
   { s with
-    pc := UInt256.ofNat 0x64e
+    pc := UInt256.ofNat 0x11e4
     stack := [blockOffsetWord (blockCount input), Padding.paddedWord input] }
 
 theorem paddedLength_eq_blockCount (input : ByteArray) :
@@ -167,28 +171,28 @@ private theorem messageOffset_lt_uint256 (input : ByteArray)
   norm_num [Padding.messageOffset] at hfit ⊢
   omega
 
-private theorem offset_lt_total (input : ByteArray)
+private theorem offset_ne_total (input : ByteArray)
     (hfit : Challenge.Ripemd160.CalldataFits input) (i : Nat)
     (hi : i < blockCount input) :
-    UInt256.lt (blockOffsetWord i) (Padding.paddedWord input) =
-      UInt256.ofNat 1 := by
+    UInt256.eq (blockOffsetWord i) (Padding.paddedWord input) = 0 := by
   have hoff := blockOffset_lt_uint256 input hfit i (Nat.le_of_lt hi)
   have hpad := paddedLength_lt_uint256 input hfit
-  have hnat : blockOffset i < Padding.paddedLength input.size := by
+  have hnat : blockOffset i ≠ Padding.paddedLength input.size := by
     rw [paddedLength_eq_blockCount input]
     unfold blockOffset
     omega
   rw [Padding.paddedWord_eq input hfit]
-  unfold UInt256.lt blockOffsetWord
+  unfold UInt256.eq blockOffsetWord
   rw [Challenge.EvmProof.Word.word_toNat_ofNat,
     Challenge.EvmProof.Word.word_toNat_ofNat,
     Nat.mod_eq_of_lt hoff, Nat.mod_eq_of_lt hpad]
-  simp only [if_pos hnat]
+  simp only [if_neg hnat]
+  rfl
 
-private theorem offset_not_lt_total (input : ByteArray)
+private theorem offset_eq_total (input : ByteArray)
     (hfit : Challenge.Ripemd160.CalldataFits input) :
-    UInt256.lt (blockOffsetWord (blockCount input))
-      (Padding.paddedWord input) = 0 := by
+    UInt256.eq (blockOffsetWord (blockCount input))
+      (Padding.paddedWord input) = UInt256.ofNat 1 := by
   have hoff := blockOffset_lt_uint256 input hfit (blockCount input) (by omega)
   have hpad := paddedLength_lt_uint256 input hfit
   have heq : blockOffset (blockCount input) =
@@ -196,11 +200,11 @@ private theorem offset_not_lt_total (input : ByteArray)
     rw [paddedLength_eq_blockCount input]
     rfl
   rw [Padding.paddedWord_eq input hfit]
-  unfold UInt256.lt blockOffsetWord
+  unfold UInt256.eq blockOffsetWord
   rw [Challenge.EvmProof.Word.word_toNat_ofNat,
     Challenge.EvmProof.Word.word_toNat_ofNat,
     Nat.mod_eq_of_lt hoff, Nat.mod_eq_of_lt hpad, heq]
-  simp only [Nat.lt_irrefl, if_false]
+  simp only [if_pos rfl]
   rfl
 
 /-- The driver's concrete pointer selects block `i` of the padded message. -/
@@ -235,12 +239,11 @@ theorem run_condition_continue (s : State) (input : ByteArray)
     (hi : i < blockCount input) (hrun : s.halt = .Running) :
     Challenge.EvmProof.Stepper.runLocatedBlock conditionPath (loopAt s input i) =
       some (afterCondition s input i) := by
-  have hlt := offset_lt_total input hfit i hi
-  have hzero : UInt256.isZero (UInt256.ofNat 1) = 0 := by decide
+  have heq := offset_ne_total input hfit i hi
   have hfalse : UInt256.isTrue (0 : UInt256) = false := by decide
   simp [conditionPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
-    loopAt, afterCondition, hrun, hlt, hzero, hfalse]
+    loopAt, afterCondition, hrun, heq, hfalse]
 
 theorem run_condition_exit (s : State) (input : ByteArray)
     (hfit : Challenge.Ripemd160.CalldataFits input)
@@ -248,14 +251,14 @@ theorem run_condition_exit (s : State) (input : ByteArray)
     (hrun : s.halt = .Running) :
     Challenge.EvmProof.Stepper.runLocatedBlock conditionPath
       (loopAt s input (blockCount input)) = some (afterExit s input) := by
-  have hlt := offset_not_lt_total input hfit
-  have hzero : UInt256.isZero (0 : UInt256) = UInt256.ofNat 1 := by decide
+  have heq := offset_eq_total input hfit
   have htrue : UInt256.isTrue (UInt256.ofNat 1) := by decide
   have honeNat : UInt256.toNat (1 : UInt256) = 1 := by decide
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x64e = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x11e4 = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 2742 (by rfl)
   simp [conditionPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
-    loopAt, afterExit, hrun, hcode, hlt, hzero,
+    loopAt, afterExit, hrun, hcode, heq,
     htrue, honeNat, UInt256.isTrue, hdest]
 
 theorem run_call (s : State) (input : ByteArray)
@@ -264,13 +267,14 @@ theorem run_call (s : State) (input : ByteArray)
     (hcode : s.executionEnv.code = submissionBytecode)
     (hrun : s.halt = .Running) :
     Challenge.EvmProof.Stepper.runLocatedBlock callPath
-      (afterCondition s input i) = some (compressEntry s input i) := by
+      (afterCondition s input i) = some (dispatchEntry s input i) := by
   have hadd := Challenge.EvmProof.Word.ofNat_add_ofNat
     (messageOffset_lt_uint256 input hfit i hi)
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x26d = true := by decide
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x129e = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 2792 (by rfl)
   simp [callPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
-    afterCondition, compressEntry, messageOffsetWord, blockOffsetWord,
+    afterCondition, dispatchEntry, messageOffsetWord, blockOffsetWord,
     hcode, hrun, hadd, hdest]
 
 theorem run_increment (s : State) (input : ByteArray) (i : Nat)
@@ -286,11 +290,18 @@ theorem run_increment (s : State) (input : ByteArray) (i : Nat)
     simpa [blockOffsetWord, blockOffset, Nat.add_mul] using
       Challenge.EvmProof.Word.ofNat_add_ofNat
         (a := i * 64) (b := 64) haddBound
-  have hdest : Decode.isValidJumpDest submissionBytecode 0x62e = true := by decide
+  have hadd2 : UInt256.ofNat 64 + blockOffsetWord i =
+      blockOffsetWord (i + 1) := by
+    rw [show UInt256.ofNat 64 + blockOffsetWord i =
+      blockOffsetWord i + UInt256.ofNat 64 from
+        Challenge.EvmProof.Word.word_add_comm _ _]
+    exact hadd
+  have hdest : Decode.isValidJumpDest submissionBytecode 0x421 = true :=
+    Artifact.submissionArtifact.isValidJumpDest_index 704 (by rfl)
   simp [incrementPath, Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
     compressReturned, afterIteration, loopAt,
-    hcode, hrun, hadd, hdest, List.exchange]
+    hcode, hrun, hadd2, hdest]
 
 private def gasStepsBlock (path : List Located) (s t : State)
     (hcode : s.executionEnv.code = submissionBytecode)
@@ -340,7 +351,7 @@ def gasSteps_call (s : State) (input : ByteArray)
     (hnp : Precompile.isPrecompileWithConfig s.executionEnv.precompileConfig s.executionEnv.fork
       s.executionEnv.codeAddr = false) :
     Challenge.EvmProof.GasSteps (afterCondition s input i)
-      (compressEntry s input i) :=
+      (dispatchEntry s input i) :=
   gasStepsBlock callPath _ _ hcode hfork
     (run_call s input hfit i hi hcode hrun) hrun hnp
 
@@ -367,7 +378,7 @@ def gasSteps_iteration_of_compress (s next : State) (input : ByteArray)
     (hforkNext : next.fork = .Osaka) (hrunNext : next.halt = .Running)
     (hnpNext : Precompile.isPrecompileWithConfig next.executionEnv.precompileConfig next.executionEnv.fork
       next.executionEnv.codeAddr = false)
-    (hcompress : Challenge.EvmProof.GasSteps (compressEntry s input i)
+    (hcompress : Challenge.EvmProof.GasSteps (dispatchEntry s input i)
       (compressReturned next input i)) :
     Challenge.EvmProof.GasSteps (loopAt s input i)
       (afterIteration next input i) := by
@@ -391,7 +402,7 @@ def gasSteps_loop_of_compress (states : Nat → State) (input : ByteArray)
       Precompile.isPrecompileWithConfig (states i).executionEnv.precompileConfig (states i).executionEnv.fork
         (states i).executionEnv.codeAddr = false)
     (hcompress : ∀ i, i < blockCount input →
-      Challenge.EvmProof.GasSteps (compressEntry (states i) input i)
+      Challenge.EvmProof.GasSteps (dispatchEntry (states i) input i)
         (compressReturned (states (i + 1)) input i)) :
     Challenge.EvmProof.GasSteps (loopAt (states 0) input 0)
       (loopAt (states (blockCount input)) input (blockCount input)) := by

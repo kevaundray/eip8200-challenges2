@@ -1,7 +1,4 @@
-import Challenge.Ripemd160.Submission.Proofs.Bytecode.DirectCorrect
-import Challenge.Ripemd160.Submission.Proofs.Bytecode.CompressionTrace
-import Challenge.Ripemd160.Submission.Proofs.Bytecode.RoundTrace
-import Challenge.Ripemd160.Submission.Proofs.Bytecode.Schedule
+import Challenge.Ripemd160.Submission.Proofs.Bytecode.CompressionInterface
 
 set_option warningAsError true
 
@@ -60,7 +57,7 @@ structure CompressionRun (input : ByteArray) where
   callStack : ∀ i, i ≤ DriverTrace.blockCount input →
     (states i).callStack = []
   blockTrace : ∀ i, i < DriverTrace.blockCount input →
-    GasSteps (DriverTrace.compressEntry (states i) input i)
+    GasSteps (DriverTrace.dispatchEntry (states i) input i)
       (DriverTrace.compressReturned (states (i + 1)) input i)
   hashWords : ∀ i, i ≤ DriverTrace.blockCount input →
     HashWordsAt input i (states i)

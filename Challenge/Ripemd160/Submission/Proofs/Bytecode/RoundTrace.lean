@@ -67,7 +67,7 @@ def afterXPath : List Located :=
    ⟨238, .op (.Dup ⟨8, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
    ⟨239, .op (.Dup ⟨10, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
    ⟨240, .op (.Dup ⟨14, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨241, .push ⟨2, by decide⟩ (UInt256.ofNat 0x93), by rfl, by decide⟩,
+   ⟨241, .push ⟨2, by decide⟩ (UInt256.ofNat 0x47a), by rfl, by decide⟩,
    ⟨242, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
 
 def afterFPath : List Located :=
@@ -167,23 +167,19 @@ private def roundPCs : List Nat :=
 
 def rotlPath : List Located :=
   [⟨2, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨3, .push ⟨4, by decide⟩ (UInt256.ofNat 0xffffffff), by rfl, by decide⟩,
-   ⟨4, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨5, .op (.Dup ⟨3, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨6, .push ⟨1, by decide⟩ (UInt256.ofNat 32), by rfl, by decide⟩,
-   ⟨7, .op .SUB, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨8, .op .SHR, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨9, .op (.Dup ⟨2, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨10, .op (.Dup ⟨4, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨11, .op .SHL, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨12, .op .OR, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨13, .op .AND, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨14, .op (.Swap ⟨2, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨15, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨16, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨17, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨18, .op (.Swap ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨19, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
+   ⟨3, .op (.Dup ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨4, .op (.Dup ⟨2, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨5, .op .SHL, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨6, .op (.Swap ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨7, .push ⟨1, by decide⟩ (UInt256.ofNat 32), by rfl, by decide⟩,
+   ⟨8, .op .SUB, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨9, .op .SHR, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨10, .op .OR, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨11, .push ⟨4, by decide⟩ (UInt256.ofNat 4294967295), by rfl, by decide⟩,
+   ⟨12, .op .AND, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨13, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨14, .op (.Swap ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨15, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
 
 /-- Complete dynamic instruction path through one `round` invocation. -/
 def roundTracePath (j : Nat) : List Located :=
@@ -210,8 +206,7 @@ def rotlReturned (s : State) (x n returnDest : UInt256)
 
 @[simp] private theorem rotlRefPC (i : Nat) (hlo : 2 ≤ i) (hhi : i ≤ 19) :
     Artifact.submissionArtifact.instructionPC i =
-      [4, 5, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-        25, 26][i - 2]! := by
+      [4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 19, 20, 21, 22, 23, 24, 25, 26][i - 2]! := by
   interval_cases i <;> rfl
 
 set_option linter.unusedSimpArgs false in
@@ -232,7 +227,9 @@ theorem run_rotl (s : State) (x n returnDest : UInt256)
       (a :: b :: rho).exchange 0 1 = some (b :: a :: rho) := by
     simpa using YulEvmCompiler.exchange_swap a b ([] : List UInt256) rho
   simp (config := { maxSteps := 200000 })
-    [rotlPath, Challenge.EvmProof.Stepper.runLocatedBlock,
+    [rotlPath, Word.land_comm, Word.lor_comm, List.exchange,
+      Challenge.EvmProof.Word.ofNat_add_mod,
+      Challenge.EvmProof.Stepper.runLocatedBlock,
       Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
       rotlEntry, rotlReturned, rotlValue, Challenge.EvmProof.Word.mask32,
       hrun, hcode, hvalid, hcap, hswap4, hswap2, Nat.add_assoc,
@@ -390,9 +387,9 @@ def setCallState (s : State) (base : UInt256) (j : Nat)
     Decode.isValidJumpDest submissionBytecode 0x4b = true := by
   exact Artifact.submissionArtifact.isValidJumpDest_index 55 (by rfl)
 
-@[simp] private theorem valid93 :
-    Decode.isValidJumpDest submissionBytecode 0x93 = true := by
-  exact Artifact.submissionArtifact.isValidJumpDest_index 108 (by rfl)
+@[simp] private theorem valid687 :
+    Decode.isValidJumpDest submissionBytecode 0x47a = true := by
+  exact Artifact.submissionArtifact.isValidJumpDest_index 765 (by rfl)
 
 @[simp] private theorem valid13A :
     Decode.isValidJumpDest submissionBytecode 0x13a = true := by

@@ -27,23 +27,19 @@ private def wfOp {op : Operation}
 def rotlPath : List
     (Challenge.EvmProof.Stepper.Located Artifact.submissionArtifact .Osaka) :=
   [⟨2, .op .JUMPDEST, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨3, .push ⟨4, by decide⟩ (UInt256.ofNat 0xffffffff), by rfl, by decide⟩,
-   ⟨4, .op (.Dup ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨5, .op (.Dup ⟨3, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨6, .push ⟨1, by decide⟩ (UInt256.ofNat 32), by rfl, by decide⟩,
-   ⟨7, .op .SUB, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨8, .op .SHR, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨9, .op (.Dup ⟨2, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨10, .op (.Dup ⟨4, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨11, .op .SHL, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨12, .op .OR, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨13, .op .AND, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨14, .op (.Swap ⟨2, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨15, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨16, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨17, .op .POP, by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨18, .op (.Swap ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
-   ⟨19, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
+   ⟨3, .op (.Dup ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨4, .op (.Dup ⟨2, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨5, .op .SHL, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨6, .op (.Swap ⟨1, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨7, .push ⟨1, by decide⟩ (UInt256.ofNat 32), by rfl, by decide⟩,
+   ⟨8, .op .SUB, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨9, .op .SHR, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨10, .op .OR, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨11, .push ⟨4, by decide⟩ (UInt256.ofNat 4294967295), by rfl, by decide⟩,
+   ⟨12, .op .AND, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨13, .op .ADD, by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨14, .op (.Swap ⟨0, by decide⟩), by rfl, wfOp (by decide) trivial rfl⟩,
+   ⟨15, .op .JUMP, by rfl, wfOp (by decide) trivial rfl⟩]
 
 def rotlValue (x n : UInt256) : UInt256 :=
   Challenge.EvmProof.Word.mask32
@@ -62,22 +58,20 @@ def rotlReturned (s : State) (x n returnDest : UInt256)
 
 def rotlReady (s : State) (x n returnDest : UInt256)
     (rest : List UInt256) : State :=
-  { s with pc := UInt256.ofNat 25
+  { s with pc := UInt256.ofNat 21
            stack := [rotlValue x n, returnDest] ++ rest }
 
-def rotlBodyPath := rotlPath.take 16
-def rotlReturnPath := rotlPath.drop 16
+def rotlBodyPath := rotlPath.take 12
+def rotlReturnPath := rotlPath.drop 12
 
 @[simp] private theorem rotlPC (i : Nat) (hlo : 2 ≤ i) (hhi : i ≤ 19) :
     Artifact.instructionPC i =
-      [4, 5, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-        25, 26][i - 2]! := by
+      [4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 19, 20, 21, 22, 23, 24, 25, 26][i - 2]! := by
   interval_cases i <;> rfl
 
 @[simp] private theorem rotlRefPC (i : Nat) (hlo : 2 ≤ i) (hhi : i ≤ 19) :
     Artifact.submissionArtifact.instructionPC i =
-      [4, 5, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-        25, 26][i - 2]! := by
+      [4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 19, 20, 21, 22, 23, 24, 25, 26][i - 2]! := by
   interval_cases i <;> rfl
 
 set_option linter.unnecessarySeqFocus false in
@@ -94,20 +88,19 @@ theorem run_rotlBody (s : State) (x n returnDest : UInt256)
   have hc6 : rest.length + 6 < 1024 := by omega
   have hc7 : rest.length + 7 < 1024 := by omega
   have hc8 : rest.length + 8 < 1024 := by omega
-  have hpc5 : UInt256.ofNat 5 + UInt256.ofNat 5 = UInt256.ofNat 10 :=
-    Challenge.EvmProof.Word.ofNat_add_ofNat (by norm_num)
-  have hpc12 : UInt256.ofNat 12 + UInt256.ofNat 2 = UInt256.ofNat 14 :=
-    Challenge.EvmProof.Word.ofNat_add_ofNat (by norm_num)
   have hswap3 (a b c d : UInt256) (rho : List UInt256) :
       (a :: b :: c :: d :: rho).exchange 0 3 =
         some (d :: b :: c :: a :: rho) := by
     simpa using YulEvmCompiler.exchange_swap a d [b, c] rho
-  simp [rotlBodyPath, rotlPath, Challenge.EvmProof.Stepper.runLocatedBlock,
+  simp [rotlBodyPath, rotlPath, Word.land_comm, Word.lor_comm, List.exchange,
+    Challenge.EvmProof.Stepper.runLocatedBlock,
     Challenge.EvmProof.Stepper.runLocated, Challenge.EvmProof.Stepper.runInstr,
     rotlEntry, rotlReady, rotlValue, Challenge.EvmProof.Word.mask32,
     hc3, hc4, hc5, hc6, hc7, hc8, hrun,
     Challenge.EvmProof.Word.word_toNat_ofNat,
-    Challenge.EvmProof.Word.succ_ofNat, hpc5, hpc12, hswap3] <;> rfl
+    Challenge.EvmProof.Word.succ_ofNat,
+    Challenge.EvmProof.Word.ofNat_add_mod, hswap3]
+  exact Word.land_comm _ _
 
 set_option linter.unusedSimpArgs false in
 theorem run_rotlReturn (s : State) (x n returnDest : UInt256)

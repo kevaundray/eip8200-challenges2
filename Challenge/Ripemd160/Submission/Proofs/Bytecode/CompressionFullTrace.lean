@@ -27,7 +27,7 @@ def driverRest (input : ByteArray) (i : Nat) : List UInt256 :=
 
 def resultState (s : State) (input : ByteArray) (i : Nat) : State :=
   let messageOffset := DriverTrace.messageOffsetWord i
-  let returnDest := UInt256.ofNat 0x643
+  let returnDest := UInt256.ofNat 0x436
   let rest := driverRest input i
   CompressionTailTrace.rightTailResult
     (leftFinalState s messageOffset returnDest rest)
@@ -137,7 +137,7 @@ def gasSteps_compress (s : State) (input : ByteArray) (i : Nat)
     GasSteps (DriverTrace.compressEntry s input i)
       (DriverTrace.compressReturned (resultState s input i) input i) := by
   let messageOffset := DriverTrace.messageOffsetWord i
-  let returnDest := UInt256.ofNat 0x643
+  let returnDest := UInt256.ofNat 0x436
   let rest := driverRest input i
   have gleft := CompressionTrace.gasSteps_compressToRight s messageOffset
     returnDest rest (by simp [rest, driverRest]) hcode hfork hrun hnp
